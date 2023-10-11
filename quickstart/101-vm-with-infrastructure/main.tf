@@ -117,6 +117,18 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     username   = var.username
     public_key = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
   }
+resource "azurerm_storage_account" "my_storage_account" {
+  name                     = "diag${random_id.random_id.hex}"
+  location                 = azurerm_resource_group.rg.location
+  resource_group_name      = azurerm_resource_group.rg.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+
+  encryption {
+    key_source = "Microsoft.Keyvault"
+    key_vault_properties {
+      key_name     = "your-key-name"  # Remplacez par le nom de la clé dans le Key Vault
+      key_vault_uri = "https://your-key-vault-name.vault.azure.net"  # Remplacez par l'URI du Key Vault
 
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
